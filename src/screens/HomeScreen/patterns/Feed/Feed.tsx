@@ -5,8 +5,10 @@ import Icon from "@src/components/Icon/Icon";
 import Image from "@src/components/Image/Image";
 import Link from "@src/components/Link/Link";
 import Button from "@src/components/Button/Button";
-import { useTheme } from '@src/theme/ThemeProvider';
-
+import { useTheme } from "@src/theme/ThemeProvider";
+import { useTemplateConfig } from "@src/services/template/TemplateConfigContext";
+import type { Post } from '@src/services/posts/PostService';
+import { FeedPost } from './patterns/FeedPost';
 
 interface FeedProps {
   children: React.ReactNode;
@@ -21,9 +23,8 @@ export default function Feed({ children }) {
         width: '100%',
         maxWidth: '683px',
         borderRadius: '8px',
-        paddingVertical: '40px',
+        paddingTop: '40px',
         paddingHorizontal: '32px',
-
       }}
     >
       {children}
@@ -33,10 +34,12 @@ export default function Feed({ children }) {
 
 Feed.Header = () => {
   const theme = useTheme();
+  const templateConfig = useTemplateConfig();
   return (
     <Box
       styleSheet={{
         borderBottom: `1px solid ${theme.colors.neutral.x200}`,
+        paddingBottom: '24px',
         marginBottom: '24px',
       }}
     >
@@ -54,64 +57,81 @@ Feed.Header = () => {
             height: { xs: '100px', md: '128px' },
             borderRadius: '100%',
           }}
-          src="https://github.com/SamuelPiasecki.png"
+          src={templateConfig?.personal?.avatar}
           alt="Imagem de perfil do Mario Souto"
         />
+
         <Box
           styleSheet={{
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
           }}
         >
-          <Box styleSheet={{ flex: '1', justifyContent: 'space-between', display: { xs: 'none', md: 'flex' } }}>
-            <Button fullWidth colorVariant='primary' size='xl' href='/'>Newsletter</Button>
-            <Button fullWidth colorVariant='neutral' size='xl' href='/'>Buy me a coffee</Button>
+          <Box styleSheet={{ flex: 1, justifyContent: 'space-between', display: { xs: 'none', md: 'flex' } }}>
+            <Button fullWidth colorVariant="primary" size="xl" href="/">Newsletter</Button>
+            <Button fullWidth colorVariant="neutral" size="xl" href="/">Buy me a coffee</Button>
           </Box>
-          <Box styleSheet={{ flex: '1', justifyContent: 'space-between', display: { xs: 'flex', md: 'none' } }}>
-            <Button fullWidth colorVariant='primary' size='xs' href='/'>Newsletter</Button>
-            <Button fullWidth colorVariant='neutral' size='xs' href='/'>Buy me a coffee</Button>
+          <Box styleSheet={{ flex: 1, justifyContent: 'space-between', display: { xs: 'flex', md: 'none' } }}>
+            <Button fullWidth colorVariant="primary" size="xs" href="/">Newsletter</Button>
+            <Button fullWidth colorVariant="neutral" size="xs" href="/">Buy me a coffee</Button>
           </Box>
         </Box>
       </Box>
-      <Button.Base href="https://github.com/SamuelPiasecki">
-        <Text tag="h1" variant='heading4'>
-          Samuel Piasecki
-        </Text>
-      </Button.Base>
-      <Text
-        styleSheet={{
-          color: theme.colors.neutral.x500
-        }}
-      >
-        @samucapiasecki - Samuel Piasecki - Brasil <br />
-        Frontend Developer
+      <Text tag="h1" variant="heading4">
+        {templateConfig?.personal?.name}
       </Text>
+
       <Box
         styleSheet={{
-          flexDirection: 'row',
-          gap: '14px',
-          paddingVertical: '24px'
+          flexDirection: "row",
+          gap: "4px",
         }}
       >
-        <Link href="https://www.linkedin.com/in/samuel-piasecki/">
-          <Icon name="linkedin" />
-        </Link>
-        <Link href="https://www.instagram.com/samucapiasecki/">
-          <Icon name="instagram" />
-        </Link>
-        <Link href="https://github.com/SamuelPiasecki">
-          <Icon name="github" />
-        </Link>
+        {Object.keys(templateConfig.personal.socialNetworks).map(key => {
+          const socialNetwork = templateConfig.personal.socialNetworks[key];
+          if (socialNetwork) {
+            return (
+              <Link
+                key={key}
+                target="_blank"
+                href={templateConfig.personal.socialNetworks[key]}
+              >
+                <Icon name={key as any} />
+              </Link>
+            )
+          }
+          return null;
+        })}
       </Box>
     </Box>
   )
 }
 
-Feed.Posts = () => {
+interface FeedPosts {
+  posts: Post[];
+}
+
+Feed.Posts = ({ posts }: FeedPosts) => {
   return (
     <Box>
-      <Text>
-        Feed Posts
+      <Text variant='heading3' styleSheet={{ marginBottom: "27px" }}>
+        Últimas Atualizações
       </Text>
+      {posts.map(({ slug, title, metadata, image }) => {
+        const { date, excerpt, url, tags } = metadata;
+        const { src, alt } = image;
+        return (
+          <FeedPost
+            key={slug}
+            title={title}
+            date={date}
+            excerpt={excerpt}
+            url={url}
+            tags={tags}
+            src={src}
+            alt={alt}
+          />
+        );
+      })}
     </Box>
   )
 }

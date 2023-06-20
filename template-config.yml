@@ -1,0 +1,10 @@
+site:
+  title: "Samuel Piasecki - Timeline"
+  description: "Bem vindo a minha timeline profissional"
+personal:
+  name: "Samuel Piasecki"
+  avatar: "https://github.com/SamuelPiasecki.png"
+  socialNetworks:
+    github: "https://www.github.com/SamuelPiasecki"
+    instagram: "https://www.instagram.com/samupiasecki/"
+    linkedin: "https://www.linkedin.com/in/samuel-piasecki/"
